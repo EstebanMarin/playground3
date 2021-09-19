@@ -32,7 +32,7 @@ object Main extends App:
       if (n <= 0) l
       else
         l match
-          //base case
+          //Handle a case outside the list
           case Nil => Nil
           //recursive case
           // remove by one the list and by one the n target
@@ -41,22 +41,8 @@ object Main extends App:
     def apply[A](as: A*): List[A] =
       if (as.isEmpty) Nil else Cons(as.head, apply(as.tail*))
 
-  val ex1: Cons[String] = Cons("a", Cons("b", Nil))
-  val ex2: Cons[Int] = Cons(1, Nil)
-  val ex3: List[Int] = Cons(2, Nil)
-  val ex4: List[Int] = List(1, 2, 3, 4, 5)
-  List.sum(ex4)
-
-  val x: Int = List(1, 2, 3, 4, 5) match
-    case Cons(x, Cons(2, Cons(4, _)))          => x
-    case Nil                                   => 42
-    case Cons(x, Cons(y, Cons(3, Cons(4, _)))) => x + y
-    case Cons(h, t)                            => h + List.sum(t)
-  // case _                                     => 101
-
-  // println(List.tail(List(1, 2, 3)))
-  // println(List.tail(List(1)))
-  // println(List.setHead(3, List(1, 2, 3)))
-  // println(List.setHead("c", List("a", "b")))
+  println(List.drop(List(1, 2, 3), 1))
+  println(List.drop(List(1, 2, 3), 0))
+  println(List.drop(Nil, 1))
 
   println("─" * 100)
