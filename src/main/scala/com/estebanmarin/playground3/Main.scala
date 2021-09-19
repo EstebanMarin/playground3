@@ -1,63 +1,62 @@
 package com.estebanmarin
 package playground3
 
-import scala.annotation.tailrec
-
 object Main extends App:
 
   println("─" * 100)
 
-  def isSorted[A](as: Array[A], ordered: (A, A) => Boolean): Boolean =
-    @tailrec
-    def go(n: Int): Boolean =
-      if (n >= as.length - 1) true
-      //if any of them is not ordered, cancel the recursive call
-      else if (!ordered(as(n), as(n + 1))) false
-      else go(n + 1)
+  sealed trait List[+A]
+  case object Nil extends List[Nothing]
+  case class Cons[+A](head: A, tail: List[A]) extends List[A]
 
-    go(0)
+  object List:
+    def sum(ints: List[Int]): Int = ints match
+      case Nil         => 0
+      case Cons(x, xs) => x + sum(xs)
 
-  // println(isSorted[Int](as = Array(7, 5, 1, 3), ordered = (a: Int, b: Int) => a > b))
-  // println(
-  //   isSorted(Array("Scala", "Exercises"), (x: String, y: String) => x.length < y.length)
-  // )
+    def product(ds: List[Double]): Double = ds match
+      case Nil          => 1.0
+      case Cons(0.0, _) => 0.0
+      case Cons(x, xs)  => x * product(xs)
 
-  def partial1[A, B, C](a: A, f: (A, B) => C): B => C =
-    (b: B) => f(a, b)
+    def tail[A](x: List[A]): List[A] = x match
+      case Nil        => sys.error(message = "Empty list")
+      case Cons(_, t) => t
 
-  def curry[A, B, C](f: (A, B) => C): A => (B => C) =
-    (a: A) => (b: B) => f(a, b)
+    def setHead[A](head: A, x: List[A]): List[A] = x match
+      case Nil        => Cons(head, Nil)
+      case Cons(_, t) => Cons(head, t)
 
-  // def f(a: Int, b: Int): Int = a + b
-  // def g(a: Int)(b: Int): Int = a + b
+    def drop[A](l: List[A], n: Int): List[A] =
+      //base case
+      if (n <= 0) l
+      else
+        l match
+          //base case
+          case Nil => Nil
+          //recursive case
+          // remove by one the list and by one the n target
+          case Cons(_, t) => drop(t, n - 1)
 
-  // println(curry(f)(1)(1) == f(1, 1))
-  // println(curry(f)(1)(1) == g(1)(1))
+    def apply[A](as: A*): List[A] =
+      if (as.isEmpty) Nil else Cons(as.head, apply(as.tail*))
 
-  def uncurry[A, B, C](f: A => B => C): (A, B) => C =
-    (a: A, b: B) => f(a)(b)
+  val ex1: Cons[String] = Cons("a", Cons("b", Nil))
+  val ex2: Cons[Int] = Cons(1, Nil)
+  val ex3: List[Int] = Cons(2, Nil)
+  val ex4: List[Int] = List(1, 2, 3, 4, 5)
+  List.sum(ex4)
 
-  // println(uncurry(g)(1, 1) == g(1)(1))
-  // println(uncurry(g)(1, 1) == f(1, 1))
+  val x: Int = List(1, 2, 3, 4, 5) match
+    case Cons(x, Cons(2, Cons(4, _)))          => x
+    case Nil                                   => 42
+    case Cons(x, Cons(y, Cons(3, Cons(4, _)))) => x + y
+    case Cons(h, t)                            => h + List.sum(t)
+  // case _                                     => 101
 
-  def f(b: Int): Int = b / 2
-  def g(a: Int): Int = a + 2
-
-  def compose[A, B, C](f: B => C, g: A => B): A => C =
-    (a: A) => f(g(a))
-
-  def x: (Int, Int) => Boolean = (x: Int, y: Int) => x < y
-  def y: Function2[Int, Int, Boolean] = (x: Int, y: Int) => x < y
-  def z = new Function2[Int, Int, Boolean] {
-    override def apply(a: Int, b: Int): Boolean = a < b
-  }
-
-  lazy val test = (f: Function2[Int, Int, Boolean], x: Int, y: Int) => f(x, y)
-  lazy val test2 = (f: (Int, Int) => Boolean, x: Int, y: Int) => f(x, y)
-
-  lazy val t3 = List(1, 2, 3)
-
-  println(compose(f, g)(2))
-  println(compose(g, f)(2))
+  // println(List.tail(List(1, 2, 3)))
+  // println(List.tail(List(1)))
+  // println(List.setHead(3, List(1, 2, 3)))
+  // println(List.setHead("c", List("a", "b")))
 
   println("─" * 100)
